@@ -42,20 +42,20 @@ param name string = 'dg${uniqueString(resourceGroup().id)}'
 ])
 param appServiceSku string = 'F0' //'B1'
 
-@description('Specifies the SKU for the Azure OpenAI resource. Defaults to **S0**')
-@allowed([
-  'S0'
-])
-param openAiSku string = 'S0'
+// @description('Specifies the SKU for the Azure OpenAI resource. Defaults to **S0**')
+// @allowed([
+//   'S0'
+// ])
+// param openAiSku string = 'S0'
 
-@description('MongoDB vCore user Name. No dashes.')
-param mongoDbUserName string
+// @description('MongoDB vCore user Name. No dashes.')
+// param mongoDbUserName string
 
-@description('MongoDB vCore password. 8-256 characters, 3 of the following: lower case, upper case, numeric, symbol.')
-@minLength(8)
-@maxLength(256)
-@secure()
-param mongoDbPassword string
+// @description('MongoDB vCore password. 8-256 characters, 3 of the following: lower case, upper case, numeric, symbol.')
+// @minLength(8)
+// @maxLength(256)
+// @secure()
+// param mongoDbPassword string
 
 @description('Azure Container Registry SKU. Defaults to **Basic**')
 param acrSku string = 'Basic'
@@ -64,40 +64,40 @@ param acrSku string = 'Basic'
 /* Variables */
 /* *************************************************************** */
 
-var openAiSettings = {
-  name: '${name}-openai'
-  sku: openAiSku
-  maxConversationTokens: '100'
-  maxCompletionTokens: '500'
-  completionsModel: {
-    name: 'gpt-35-turbo'
-    version: '0613'
-    deployment: {
-      name: 'completions'
-    }
-    sku: {
-      name: 'Standard'
-      capacity: 120
-    }
-  }
-  embeddingsModel: {
-    name: 'text-embedding-ada-002'
-    version: '2'
-    deployment: {
-      name: 'embeddings'
-    }
-    sku: {
-      name: 'Standard'
-      capacity: 120     
-    }
-  }
-}
+// var openAiSettings = {
+//   name: '${name}-openai'
+//   sku: openAiSku
+//   maxConversationTokens: '100'
+//   maxCompletionTokens: '500'
+//   completionsModel: {
+//     name: 'gpt-35-turbo'
+//     version: '0613'
+//     deployment: {
+//       name: 'completions'
+//     }
+//     sku: {
+//       name: 'Standard'
+//       capacity: 120
+//     }
+//   }
+//   embeddingsModel: {
+//     name: 'text-embedding-ada-002'
+//     version: '2'
+//     deployment: {
+//       name: 'embeddings'
+//     }
+//     sku: {
+//       name: 'Standard'
+//       capacity: 120     
+//     }
+//   }
+// }
 
-var mongovCoreSettings = {
-  mongoClusterName: '${name}-mongo'
-  mongoClusterLogin: mongoDbUserName
-  mongoClusterPassword: mongoDbPassword
-}
+// var mongovCoreSettings = {
+//   mongoClusterName: '${name}-mongo'
+//   mongoClusterLogin: mongoDbUserName
+//   mongoClusterPassword: mongoDbPassword
+// }
 
 var appServiceSettings = {
   plan: {
@@ -117,95 +117,95 @@ var appServiceSettings = {
 /* Azure Cosmos DB for MongoDB vCore */
 /* *************************************************************** */
 
-resource mongoCluster 'Microsoft.DocumentDB/mongoClusters@2023-03-01-preview' = {
-  name: mongovCoreSettings.mongoClusterName
-  location: location
-  properties: {
-    administratorLogin: mongovCoreSettings.mongoClusterLogin
-    administratorLoginPassword: mongovCoreSettings.mongoClusterPassword
-    serverVersion: '5.0'
-    nodeGroupSpecs: [
-      {
-        kind: 'Shard'
-        sku: 'M30'
-        diskSizeGB: 128
-        enableHa: false
-        nodeCount: 1
-      }
-    ]
-  }
-}
+// resource mongoCluster 'Microsoft.DocumentDB/mongoClusters@2023-03-01-preview' = {
+//   name: mongovCoreSettings.mongoClusterName
+//   location: location
+//   properties: {
+//     administratorLogin: mongovCoreSettings.mongoClusterLogin
+//     administratorLoginPassword: mongovCoreSettings.mongoClusterPassword
+//     serverVersion: '5.0'
+//     nodeGroupSpecs: [
+//       {
+//         kind: 'Shard'
+//         sku: 'M30'
+//         diskSizeGB: 128
+//         enableHa: false
+//         nodeCount: 1
+//       }
+//     ]
+//   }
+// }
 
-resource mongoFirewallRulesAllowAzure 'Microsoft.DocumentDB/mongoClusters/firewallRules@2023-03-01-preview' = {
-  parent: mongoCluster
-  name: 'allowAzure'
-  properties: {
-    startIpAddress: '0.0.0.0'
-    endIpAddress: '0.0.0.0'
-  }
-}
+// resource mongoFirewallRulesAllowAzure 'Microsoft.DocumentDB/mongoClusters/firewallRules@2023-03-01-preview' = {
+//   parent: mongoCluster
+//   name: 'allowAzure'
+//   properties: {
+//     startIpAddress: '0.0.0.0'
+//     endIpAddress: '0.0.0.0'
+//   }
+// }
 
-resource mongoFirewallRulesAllowAll 'Microsoft.DocumentDB/mongoClusters/firewallRules@2023-03-01-preview' = {
-  parent: mongoCluster
-  name: 'allowAll'
-  properties: {
-    startIpAddress: '0.0.0.0'
-    endIpAddress: '255.255.255.255'
-  }
-}
+// resource mongoFirewallRulesAllowAll 'Microsoft.DocumentDB/mongoClusters/firewallRules@2023-03-01-preview' = {
+//   parent: mongoCluster
+//   name: 'allowAll'
+//   properties: {
+//     startIpAddress: '0.0.0.0'
+//     endIpAddress: '255.255.255.255'
+//   }
+// }
 
 
 /* *************************************************************** */
 /* Azure OpenAI */
 /* *************************************************************** */
 
-resource openAiAccount 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
-  name: openAiSettings.name
-  location: location
-  sku: {
-    name: openAiSettings.sku    
-  }
-  kind: 'OpenAI'
-  properties: {
-    customSubDomainName: openAiSettings.name
-    publicNetworkAccess: 'Enabled'
-  }
-}
+// resource openAiAccount 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
+//   name: openAiSettings.name
+//   location: location
+//   sku: {
+//     name: openAiSettings.sku    
+//   }
+//   kind: 'OpenAI'
+//   properties: {
+//     customSubDomainName: openAiSettings.name
+//     publicNetworkAccess: 'Enabled'
+//   }
+// }
 
-resource openAiEmbeddingsModelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2023-05-01' = {
-  parent: openAiAccount
-  name: openAiSettings.embeddingsModel.deployment.name  
-  sku: {
-    name: openAiSettings.embeddingsModel.sku.name
-    capacity: openAiSettings.embeddingsModel.sku.capacity
-  }
-  properties: {
-    model: {
-      format: 'OpenAI'
-      name: openAiSettings.embeddingsModel.name
-      version: openAiSettings.embeddingsModel.version
-    }
-  }
-}
+// resource openAiEmbeddingsModelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2023-05-01' = {
+//   parent: openAiAccount
+//   name: openAiSettings.embeddingsModel.deployment.name  
+//   sku: {
+//     name: openAiSettings.embeddingsModel.sku.name
+//     capacity: openAiSettings.embeddingsModel.sku.capacity
+//   }
+//   properties: {
+//     model: {
+//       format: 'OpenAI'
+//       name: openAiSettings.embeddingsModel.name
+//       version: openAiSettings.embeddingsModel.version
+//     }
+//   }
+// }
 
-resource openAiCompletionsModelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2023-05-01' = {
-  parent: openAiAccount
-  name: openAiSettings.completionsModel.deployment.name
-  dependsOn: [
-    openAiEmbeddingsModelDeployment
-  ]
-  sku: {
-    name: openAiSettings.completionsModel.sku.name
-    capacity: openAiSettings.completionsModel.sku.capacity
-  }
-  properties: {
-    model: {
-      format: 'OpenAI'
-      name: openAiSettings.completionsModel.name
-      version: openAiSettings.completionsModel.version
-    }    
-  }
-}
+// resource openAiCompletionsModelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2023-05-01' = {
+//   parent: openAiAccount
+//   name: openAiSettings.completionsModel.deployment.name
+//   dependsOn: [
+//     openAiEmbeddingsModelDeployment
+//   ]
+//   sku: {
+//     name: openAiSettings.completionsModel.sku.name
+//     capacity: openAiSettings.completionsModel.sku.capacity
+//   }
+//   properties: {
+//     model: {
+//       format: 'OpenAI'
+//       name: openAiSettings.completionsModel.name
+//       version: openAiSettings.completionsModel.version
+//     }    
+//   }
+// }
 
 /* *************************************************************** */
 /* Logging and instrumentation */

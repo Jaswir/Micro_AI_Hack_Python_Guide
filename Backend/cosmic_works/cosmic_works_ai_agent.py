@@ -22,8 +22,8 @@ DB_CONNECTION_STRING = os.environ.get("DB_CONNECTION_STRING")
 AOAI_ENDPOINT = os.environ.get("AOAI_ENDPOINT")
 AOAI_KEY = os.environ.get("AOAI_KEY")
 AOAI_API_VERSION = "2023-09-01-preview"
-COMPLETIONS_DEPLOYMENT = "completions"
-EMBEDDINGS_DEPLOYMENT = "embeddings"
+EMBEDDINGS_DEPLOYMENT ="text-embedding-ada-002"
+COMPLETIONS_DEPLOYMENT = "gpt-35-turbo"
 db = pymongo.MongoClient(DB_CONNECTION_STRING).cosmic_works
 
 class CosmicWorksAIAgent:

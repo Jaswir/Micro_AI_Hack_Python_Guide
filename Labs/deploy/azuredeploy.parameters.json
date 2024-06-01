@@ -4,16 +4,7 @@
     "parameters": {
         "location": { 
             "value": "eastus"
-        },
-        "openAiSku": {
-            "value": "S0"
-        },        
-        "mongoDbUserName": {
-            "value": "cosmicworksadmin"
-        },
+        }
         
-        "mongoDbPassword": {
-            "value": "CfuzfY*AcP8l"
-        }        
     }
 }
