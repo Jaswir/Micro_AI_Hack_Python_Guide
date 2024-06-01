@@ -2,10 +2,11 @@ FROM python:3.11
 
 WORKDIR /code
 COPY ./requirements.txt /code/requirements.txt
+COPY ./openai_fix.py /code/openai_fix.py
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 RUN apt-get update -y
 RUN apt-get install vim -y
-RUN cat openai_fix.py > /usr/local/lib/python3.11/site-packages/langchain_community/embeddings/openai.py
+RUN cat /code/openai_fix.py > /usr/local/lib/python3.11/site-packages/langchain_community/embeddings/openai.py
 COPY . /code
 
 EXPOSE 80
