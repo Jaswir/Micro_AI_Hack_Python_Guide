@@ -40,7 +40,7 @@ param name string = 'dg${uniqueString(resourceGroup().id)}'
   'P0v3'
   'F0'
 ])
-param appServiceSku string = 'F0' //'B1'
+param appServiceSku string = 'P0v3' //'B1'
 
 // @description('Specifies the SKU for the Azure OpenAI resource. Defaults to **S0**')
 // @allowed([
